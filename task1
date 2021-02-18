@@ -1,0 +1,42 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
+def standardize(X):
+    m,n=X.shape
+    values={}  # 保存每一列的mean和std，便于对预测数据进行标准化
+    for i in range(n):
+        features=X[:,i]
+        meanVal=features.mean(axis=0)
+        stdVal=features.std(axis=0)
+        values[i]=[meanVal, stdVal]
+        if stdVal!=0:
+            X[:,i]=(features - meanVal)/stdVal
+        else:
+            X[:,i]=0
+    return X,values
+    
+def F(W,X):
+    return np.dot(X,W)
+
+def J(W,X,Y):
+    m=len(X)
+    return np.sum(np.dot((F(W,X)-Y).T,F(W,X)-Y)/(2*m))
+
+def BGD(X,Y,step,maxloop,eps):
+    m,n=X.shape   #m个样本，n=3
+    W=np.zeros((n,1))
+    count=0       #迭代次数
+    cost=np.inf   #代价
+    cost_s=[J(W, X, Y),] #储存cost更新过程
+    W_s={}#储存W更新过程
+    for i in range(n):
+        W_s[i]=[W[i,0],]
+    
+    while(count<=maxloop):
+        count+=1
+        W=W-step*1.0/m*np.dot(X.T,F(W,X)-Y)
+        
+        for i in range(n):
+            W_s[i].append(W[i,0])
+        cost=J(W,X,Y)
+        cost_s.append(cost)
