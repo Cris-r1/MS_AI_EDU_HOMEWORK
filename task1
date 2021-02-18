@@ -40,3 +40,35 @@ def BGD(X,Y,step,maxloop,eps):
             W_s[i].append(W[i,0])
         cost=J(W,X,Y)
         cost_s.append(cost)
+        if(abs(cost_s[-1]-cost_s[-2])<eps):
+            break
+    
+    return W,W_s,cost_s
+
+data=np.loadtxt('mlm.csv',delimiter=',',skiprows=1)
+originX=data[:,:2]
+Y=data[:,2:]
+m,n=originX.shape
+X,values=standardize(originX.copy())
+X=np.concatenate((np.ones((m,1)), X), axis=1)
+
+step=1
+maxloop=100000 #最大迭代次数
+eps=0.001      #收敛边界
+result=BGD(X,Y,step,maxloop,eps)
+W,W_s,cost_s=result
+print(cost_s[-1])
+
+ax = plt.gca(projection='3d')
+point_x = data[:, 0]
+point_y = data[:, 1]
+point_z = data[:, 2]
+xa = np.linspace(0, 100, 5)
+ya = np.linspace(0, 100, 5)
+sur_x, sur_y = np.meshgrid(xa, ya)
+ax.plot_surface(sur_x, sur_y, sol.W[0]+sur_x*sol.W[1]+sur_y*sol.W[2], color='yellow', alpha=0.6)
+ax.scatter3D(point_x, point_y, point_z, cmap='Blues')
+ax.set_xlabel('x')
+ax.set_ylabel('y')
+ax.set_zlabel('z')
+plt.show()
